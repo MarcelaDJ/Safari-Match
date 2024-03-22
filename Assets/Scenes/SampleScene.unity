@@ -376,6 +376,17 @@ MonoBehaviour:
   titleObject: {fileID: 3909514676098950780, guid: b03e282136d37194d886d4d3be24d6d5, type: 3}
   cameraSizeOffset: 0
   cameraVerticalOffset: 0
+  availablePieces:
+  - {fileID: 160426566289418533, guid: d275b9855615b684fb060ce80a00e493, type: 3}
+  - {fileID: 9053936788332593126, guid: a0dfa7e18eefec449a3e040e1e72c5ff, type: 3}
+  - {fileID: 2379584006782864568, guid: 5d97275b54efddc4baf4285779fb011f, type: 3}
+  - {fileID: 7594108110622307020, guid: 6e948a59326e8534f9f71ff09022c598, type: 3}
+  - {fileID: 1434042694702569817, guid: 561cd30b5bb1bf244a273a5e7c4e7da4, type: 3}
+  - {fileID: 6372224414492303157, guid: d5a1eaf8c947c4d41832f1adc7a7650e, type: 3}
+  - {fileID: 2794637372854117748, guid: 9be8dee2917a0924eb496a655d19368c, type: 3}
+  - {fileID: 5856742293021096793, guid: 54cf8d5a5c906744dbab722a50984f4f, type: 3}
+  - {fileID: 4992387095643715827, guid: 191415c1a0ab8724c8dfd5f54a20f20a, type: 3}
+  - {fileID: 3905728490999999282, guid: 65be396c9ce0f674e9366d2ce9f31d6c, type: 3}
 --- !u!4 &1290343462
 Transform:
   m_ObjectHideFlags: 0
