@@ -18,6 +18,7 @@ public class Board : MonoBehaviour
     Tile startTile;
     Tile endTile;
     bool swappinPieces = false;
+    public float timeBetweenPieces = 0.01f;
 
     void Start()
     {
@@ -25,10 +26,10 @@ public class Board : MonoBehaviour
         Pieces = new Piece[width, height];
         SetupBoard();
         PositionCamera();
-        SetupPieces();
+        StartCoroutine(SetupPieces());
     }
 
-    private void SetupPieces()
+    private IEnumerator SetupPieces()
     {
         int maxInteractions = 50;
         int currentInteraction = 0;
@@ -37,20 +38,25 @@ public class Board : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                currentInteraction = 0;
-                var newPiece = CreatePieceAt(x, y);
-                while (HasPreviousMatches(x, y))
+                yield return new WaitForSeconds(timeBetweenPieces);
+                if (Pieces[x, y]==null)
                 {
-                    ClearPieceAt(x, y);
-                    newPiece = CreatePieceAt(x, y);
-                    currentInteraction++;
-                    if (currentInteraction > maxInteractions)
+                    currentInteraction = 0;
+                    var newPiece = CreatePieceAt(x, y);
+                    while (HasPreviousMatches(x, y))
                     {
-                        break;
+                        ClearPieceAt(x, y);
+                        newPiece = CreatePieceAt(x, y);
+                        currentInteraction++;
+                        if (currentInteraction > maxInteractions)
+                        {
+                            break;
+                        }
                     }
                 }
             }
         }
+        yield return null;
     }
 
     private void ClearPieceAt(int x, int y)
@@ -96,22 +102,32 @@ public class Board : MonoBehaviour
     }
     public void TitleDown(Tile tile_)
     {
-        startTile = tile_;
+        if (!swappinPieces)
+        {
+            startTile = tile_;
+        }
     }
     public void TitleOver(Tile tile_)
     {
-        endTile = tile_;
+        if (!swappinPieces)
+        {
+            endTile = tile_;
+        }
     }
     public void TitleUp(Tile tile_)
     {
-        if (startTile != null && endTile != null && IsCloseTo(startTile, endTile))
+        if (!swappinPieces)
         {
-            StartCoroutine(SwapTiles());
+            if (startTile != null && endTile != null && IsCloseTo(startTile, endTile))
+            {
+                StartCoroutine(SwapTiles());
+            }
         }
     }
 
     IEnumerator SwapTiles()
     {
+        swappinPieces = true;
         var StartPiece = Pieces[startTile.x, startTile.y];
         var EndPiece = Pieces[endTile.x, endTile.y];
         StartPiece.Move(endTile.x, endTile.y);
@@ -153,6 +169,38 @@ public class Board : MonoBehaviour
         });
         List<int> columns = GetColumns(piecesToClear);
         List<Piece> collapsedPieces = collapseColumns(columns, 0.3f);
+        FindMatchRecursively(collapsedPieces);
+    }
+
+    private void FindMatchRecursively(List<Piece> collapsedPieces)
+    {
+        StartCoroutine(FindMatchRecursivelyCoroutine(collapsedPieces));
+    }
+
+    IEnumerator FindMatchRecursivelyCoroutine(List<Piece> collapsedPieces)
+    {
+        yield return new WaitForSeconds(1f);
+        List<Piece> newMatches = new List<Piece>();
+        collapsedPieces.ForEach(piece =>
+        {
+            var matches = GetMatchByPieces(piece.x, piece.y, 3);
+            if (matches != null)
+            {
+                newMatches = newMatches.Union(matches).ToList();
+                ClearPieces(matches);
+            }
+        });
+        if (newMatches.Count > 0)
+        {
+            var newCollapsedPieces = collapseColumns(GetColumns(newMatches), 0.3f);
+            FindMatchRecursively(newCollapsedPieces);
+        } else
+        {
+            yield return new WaitForSeconds(0.1f);
+            StartCoroutine(SetupPieces());
+            swappinPieces = false;
+        }
+        yield return null;
     }
 
     private List<Piece> collapseColumns(List<int> columns, float timeToCollapse)
