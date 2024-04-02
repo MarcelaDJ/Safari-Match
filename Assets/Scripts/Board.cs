@@ -12,13 +12,14 @@ public class Board : MonoBehaviour
     public GameObject titleObject;
     public float cameraSizeOffset;
     public float cameraVerticalOffset;
+    public int PointsPerMatch;
     public GameObject[] availablePieces;
     Tile[,] Tiles;
     Piece[,] Pieces;
     Tile startTile;
     Tile endTile;
     bool swappinPieces = false;
-    public float timeBetweenPieces = 0.01f;
+    public float timeBetweenPieces = 0.02f;
 
     void Start()
     {
@@ -61,18 +62,19 @@ public class Board : MonoBehaviour
 
     private void ClearPieceAt(int x, int y)
     {
-        var pieceToClear = Pieces[x, y];
-        Destroy(Pieces[x, y].gameObject);
+        var pieceToClear = Pieces[x, y]; 
+        pieceToClear.Remove(true);
         Pieces[x, y] = null;
     }
 
     private Piece CreatePieceAt(int x, int y)
     {
         var selectedPiece = availablePieces[UnityEngine.Random.Range(0, availablePieces.Length)];
-        var o = Instantiate(selectedPiece, new Vector3(x, y, -5), Quaternion.identity); //quaternion = rotacion por defecto
+        var o = Instantiate(selectedPiece, new Vector3(x, y+1, -5), Quaternion.identity); //quaternion = rotacion por defecto
         o.transform.parent = transform;
         Pieces[x, y] = o.GetComponent<Piece>();
         Pieces[x, y]?.Setup(x, y, this);
+        Pieces[x, y]?.Move(x, y);   
         return Pieces[x, y];
     }
 
@@ -152,6 +154,7 @@ public class Board : MonoBehaviour
         else
         {
             ClearPieces(allMatches);
+            AwardPoints(allMatches);
         }
 
         startTile = null;
@@ -188,6 +191,7 @@ public class Board : MonoBehaviour
             {
                 newMatches = newMatches.Union(matches).ToList();
                 ClearPieces(matches);
+                AwardPoints(matches);
             }
         });
         if (newMatches.Count > 0)
@@ -196,7 +200,7 @@ public class Board : MonoBehaviour
             FindMatchRecursively(newCollapsedPieces);
         } else
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.01f);
             StartCoroutine(SetupPieces());
             swappinPieces = false;
         }
@@ -328,5 +332,10 @@ public class Board : MonoBehaviour
             foundMatches = foundMatches.Union(horizontalMatches).ToList();
         }
         return foundMatches;
+    }
+
+    public void AwardPoints(List<Piece> allMatches)
+    {
+        GameManager.Instance.AddPoints(allMatches.Count * PointsPerMatch);
     }
 }
