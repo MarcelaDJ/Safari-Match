@@ -104,21 +104,21 @@ public class Board : MonoBehaviour
     }
     public void TitleDown(Tile tile_)
     {
-        if (!swappinPieces)
+        if (!swappinPieces && GameManager.Instance.gameState==GameManager.GameState.InGame)
         {
             startTile = tile_;
         }
     }
     public void TitleOver(Tile tile_)
     {
-        if (!swappinPieces)
+        if (!swappinPieces && GameManager.Instance.gameState == GameManager.GameState.InGame)
         {
             endTile = tile_;
         }
     }
     public void TitleUp(Tile tile_)
     {
-        if (!swappinPieces)
+        if (!swappinPieces && GameManager.Instance.gameState == GameManager.GameState.InGame)
         {
             if (startTile != null && endTile != null && IsCloseTo(startTile, endTile))
             {
