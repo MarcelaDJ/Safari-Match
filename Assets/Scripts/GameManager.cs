@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public GameState gameState;
     public int Points = 0;
     public UnityEvent OnPointsUpdated;
+    public UnityEvent<GameState> OnGameStateUpdated;
     public enum GameState
     {
         Idle,
@@ -44,7 +45,21 @@ public class GameManager : MonoBehaviour
             if (currentTimeToMatch > timeToMatch)
             {
                 gameState = GameState.GameOver;
+                OnGameStateUpdated?.Invoke(gameState);
             }
         }
+    }
+
+    public void RestartGame()
+    {
+        Points = 0;
+        gameState = GameState.InGame;
+        OnGameStateUpdated?.Invoke(gameState);
+        currentTimeToMatch = 0f;
+    }
+
+    public void ExitGame()
+    {
+
     }
 }
