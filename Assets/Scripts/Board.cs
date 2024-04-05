@@ -163,6 +163,7 @@ public class Board : MonoBehaviour
         swappinPieces = true;
         var StartPiece = Pieces[startTile.x, startTile.y];
         var EndPiece = Pieces[endTile.x, endTile.y];
+        AudioManager.Instance.Move();
         StartPiece.Move(endTile.x, endTile.y);
         EndPiece.Move(startTile.x, startTile.y);
         Pieces[startTile.x, startTile.y] = EndPiece;
@@ -177,6 +178,7 @@ public class Board : MonoBehaviour
 
         if (allMatches.Count == 0)
         {
+            AudioManager.Instance.Miss();
             StartPiece.Move(startTile.x, startTile.y);
             EndPiece.Move(endTile.x, endTile.y);
             Pieces[startTile.x, startTile.y] = StartPiece;
